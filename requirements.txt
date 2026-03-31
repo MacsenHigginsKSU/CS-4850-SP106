@@ -12,6 +12,7 @@ matplotlib-inline==0.2.1
 ml_dtypes==0.5.4
 numpy==2.4.2
 pandas==3.0.1
+plotly==6.6.0
 python-dateutil==2.9.0.post0
 scikit-learn==1.8.0
 scipy==1.17.1
