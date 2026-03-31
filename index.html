@@ -56,30 +56,76 @@
         </select>
     </div>
     
-    <div class="mt-8">
-        <button class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-lg shadow transition-colors">
+    <div class="mt-4">
+        <button id="run-forecast-btn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-lg shadow transition-colors">
             Run Forecast
         </button>
     </div>
 
+    
+    <br><br>
+    <label class="block text-sm font-medium text-gray-700 mb-4">
+        Predicted Energy Usage:
+    </label>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <input id="prediction-output" input type="text" id="disabled-input-2" value="XXXXXXXXXX" 
+            class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" disabled readonly>
+    </div>
+    
+
 <br><br><br><br>
+
+<!--This div creates a new plotly html file which displays data gathered in 2010-->
 
 <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8 border border-gray-200">
             <div class="p-6">
-                <h2 class="text-lg font-semibold text-gray-700 mb-4 text-center">Energy Use for year 2010</h2>
-                <div class="aspect-video bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
-                    <span class="text-gray-400 italic">Graph Output Area (Plotly/Matplotlib)</span>
+                <h2 class="text-lg font-semibold text-gray-700 mb-4 text-center">Energy Use for Year 2010</h2>
+                <div class="aspect-video bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                    <iframe src="plot_2010.html" class="w-full h-full border-none"></iframe>
                 </div>
             </div>
 </div>
 
 </div>
-
-
         <footer class="mt-12 text-center text-gray-500 text-sm">
             <p>Macsen Higgins &bull; Jacob Southern</p>
         </footer>
 </div>
+
+
+<!--Basic javascript that saves the data from the input boxes-->
+<script>
+    // 1. Listen for the button click
+    document.getElementById('run-forecast-btn').addEventListener('click', function() {
+        
+        // 2. Extract values from the UI
+        const selectedDate = document.getElementById('forecast-date').value;
+        const selectedTime = document.getElementById('forecast-time').value;
+
+        //ensures the user actually picked a date
+        if (!selectedDate) {
+            alert("Please select a date first!");
+            return;
+        }
+
+        // 3. Format the string (Normalization)
+            // Turns "2010-05-01" + "1:00" into "2010-05-01 01:00:00"
+            const formattedTime = selectedTime.padStart(5, '0') + ":00";
+            const finalDateTime = `${selectedDate} ${formattedTime}`;
+
+            // 4. Output to the readonly textbox
+            const outputBox = document.getElementById('prediction-output');
+            outputBox.value = finalDateTime;
+            
+            console.log("UI updated with:", finalDateTime);
+    });
+
+
+
+        
+</script>
+
+
 
 </body>
 </html>
