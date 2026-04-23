@@ -69,7 +69,7 @@
     </label>
     <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
         <input id="prediction-output" input type="text" id="disabled-input-2" value="XXXXXXXXXX" 
-            class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" disabled readonly>
+            class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-center outline-none" disabled readonly>
     </div>
     
 
@@ -96,7 +96,7 @@
 <!--Basic javascript that saves the data from the input boxes-->
 <script>
     // 1. Listen for the button click
-    document.getElementById('run-forecast-btn').addEventListener('click', function() {
+    document.getElementById('run-forecast-btn').addEventListener('click', async function() {
         
         // 2. Extract values from the UI
         const selectedDate = document.getElementById('forecast-date').value;
@@ -115,9 +115,33 @@
 
             // 4. Output to the readonly textbox
             const outputBox = document.getElementById('prediction-output');
-            outputBox.value = finalDateTime;
+
+            try {
+                const response = await fetch('user_datetime_predictions.csv')
+                const csvText = await response.text();
+
+                const rows = csvText.split('\n');
+                const headers = rows[0].split(',');
+
+                const matchingRow = rows.find(row => row.startsWith(finalDateTime));
+
+                if (matchingRow) {
+                    const columns = matchingRow.split(',');
+                    const predictionValue = columns[1];
+
+                    outputBox.value = `${predictionValue} MWh`;
+                    console.log("Found prediction:", predictionValue);
+                } else {
+                    outputBox.value = "No data found for this time.";
+                    console.warn("Timestamp not found in CSV:", finalDateTime);
+                }
+
+            } catch (error) {
+                console.error("Error loading CSV:", error);
+                alert("Could not load the prediction data.");
+            }
             
-            console.log("UI updated with:", finalDateTime);
+            //console.log("UI updated with:", finalDateTime);
     });
 
 
