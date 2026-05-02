@@ -3,153 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LSTM Energy Forecasting</title>
+    <title>SP106 Homepage</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Original Meta Tags -->
+    <meta name="robots" content="noindex, no follow, noarchive" />
+    <meta name="author" content="Sharon Perry" />
 </head>
 <body class="bg-gray-50 font-sans leading-normal tracking-normal">
     <div class="container mx-auto px-4 py-12 max-w-4xl">
         
+        <!-- Header -->
         <header class="text-center mb-10">
+            <!-- official KSU colors gold #FFC425 and black #231F20 (noted for reference) -->
+            <img src="assets/images/KSU_ccse_logo.png" alt="KSU" class="mx-auto mb-6 w-full max-w-[473px] h-auto rounded">
             <h1 class="text-4xl font-extrabold text-gray-800 mb-2">
-                PJM Energy Consumption Forecast
+                SP 106 - Electricity Load Forecasting with LSTMs
             </h1>
-            <p class="text-gray-600">LSTM Neural Network Analysis</p>
+            <p class="text-xl text-gray-600"> CS 4850 — Senior Project </p>
         </header>
 
-        
-
-        <div class="bg-white rounded-xl shadow-md p-8 border border-gray-200 text-center">
-    <label class="block text-sm font-medium text-gray-700 mb-4">
-        Select Date and Time for Prediction:
-    </label>
-    
-    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-        <input type="date" id="forecast-date" name="forecast-date"min="2020-01-01"max="2026-07-01"
-               class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-
-        <select id="forecast-time" name="forecast-time" 
-                class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
-            <option value="0:00">0:00</option>
-            <option value="1:00">1:00</option>
-            <option value="2:00">2:00</option>
-            <option value="3:00">3:00</option>
-            <option value="4:00">4:00</option>
-            <option value="5:00">5:00</option>
-            <option value="6:00">6:00</option>
-            <option value="7:00">7:00</option>
-            <option value="8:00">8:00</option>
-            <option value="9:00">9:00</option>
-            <option value="10:00">10:00</option>
-            <option value="11:00">11:00</option>
-            <option value="12:00">12:00</option>
-            <option value="13:00">13:00</option>
-            <option value="14:00">14:00</option>
-            <option value="15:00">15:00</option>
-            <option value="16:00">16:00</option>
-            <option value="17:00">17:00</option>
-            <option value="18:00">18:00</option>
-            <option value="19:00">19:00</option>
-            <option value="20:00">20:00</option>
-            <option value="21:00">21:00</option>
-            <option value="22:00">22:00</option>
-            <option value="23:00">23:00</option>
-        </select>
-    </div>
-    
-    <div class="mt-4">
-        <button id="run-forecast-btn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-lg shadow transition-colors">
-            Run Forecast
-        </button>
-    </div>
-
-    
-    <br><br>
-    <label class="block text-sm font-medium text-gray-700 mb-4">
-        Predicted Energy Usage:
-    </label>
-    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-        <input id="prediction-output" input type="text" id="disabled-input-2" value="XXXXXXXXXX" 
-            class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-center outline-none" disabled readonly>
-    </div>
-    
-
-<br><br><br><br>
-
-<!--This div creates a new plotly html file which displays data gathered in 2010-->
-
-<div class="bg-white rounded-xl shadow-md overflow-hidden mb-8 border border-gray-200">
-            <div class="p-6">
-                <h2 class="text-lg font-semibold text-gray-700 mb-4 text-center">Energy Use for Year 2010</h2>
-                <div class="aspect-video bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                    <iframe src="assets/plot_2010.html" class="w-full h-full border-none"></iframe>
-                </div>
-            </div>
-</div>
-
-</div>
-        <footer class="mt-12 text-center text-gray-500 text-sm">
-            <p>Macsen Higgins &bull; Jacob Southern</p>
-        </footer>
-</div>
-
-
-<!--Basic javascript that saves the data from the input boxes-->
-<script>
-    // 1. Listen for the button click
-    document.getElementById('run-forecast-btn').addEventListener('click', async function() {
-        
-        // 2. Extract values from the UI
-        const selectedDate = document.getElementById('forecast-date').value;
-        const selectedTime = document.getElementById('forecast-time').value;
-
-        //ensures the user actually picked a date
-        if (!selectedDate) {
-            alert("Please select a date first!");
-            return;
-        }
-
-        // 3. Format the string (Normalization)
-            // Turns "2010-05-01" + "1:00" into "2010-05-01 01:00:00"
-            const formattedTime = selectedTime.padStart(5, '0') + ":00";
-            const finalDateTime = `${selectedDate} ${formattedTime}`;
-
-            // 4. Output to the readonly textbox
-            const outputBox = document.getElementById('prediction-output');
-
-            try {
-                const response = await fetch('user_datetime_predictions.csv')
-                const csvText = await response.text();
-
-                const rows = csvText.split('\n');
-                const headers = rows[0].split(',');
-
-                const matchingRow = rows.find(row => row.startsWith(finalDateTime));
-
-                if (matchingRow) {
-                    const columns = matchingRow.split(',');
-                    const predictionValue = columns[1];
-
-                    outputBox.value = `${predictionValue} MWh`;
-                    console.log("Found prediction:", predictionValue);
-                } else {
-                    outputBox.value = "No data found for this time.";
-                    console.warn("Timestamp not found in CSV:", finalDateTime);
-                }
-
-            } catch (error) {
-                console.error("Error loading CSV:", error);
-                alert("Could not load the prediction data.");
-            }
+        <!-- Navigation Section -->
+        <nav class="bg-white rounded-xl shadow-md p-6 border border-gray-200 mb-8 flex flex-col items-center">
+            <!-- Centered Large Header -->
+            <span class="text-xl font-extrabold text-gray-800 uppercase tracking-wide mb-4">
+                Contents
+            </span>
             
-            //console.log("UI updated with:", finalDateTime);
-    });
+            <!-- Links Row -->
+            <div class="flex flex-wrap justify-center items-center gap-2 sm:gap-6">
+                <a href="demo.html" target="_blank" class="text-blue-600 hover:text-blue-800 hover:bg-blue-50 font-medium px-4 py-2 rounded transition-colors">Demo</a>
+                <a href="assets/final_report.docx" target="_blank" class="text-blue-600 hover:text-blue-800 hover:bg-blue-50 font-medium px-4 py-2 rounded transition-colors">Final Report</a>
+                <a href="https://github.com/MacsenHigginsKSU/CS-4850-SP106" target="_blank" class="text-blue-600 hover:text-blue-800 hover:bg-blue-50 font-medium px-4 py-2 rounded transition-colors text-center">GitHub
+                </a>
+                <a href="https://www.youtube.com/watch?v=wR8ynKf6wX8" target="_blank" class="text-blue-600 hover:text-blue-800 hover:bg-blue-50 font-medium px-4 py-2 rounded transition-colors text-center">Presentation Video</a>
+            </div>
+        </nav>
 
+        <!-- Main Content Area: Authors -->
+        <main class="bg-white rounded-xl shadow-md p-8 border border-gray-200 mb-8">
+            
+            <table class="w-full max-w-2xl mx-auto border-collapse">
+                <tbody>
+                    <!-- Row 1: Names -->
+                    <tr>
+                        <td class="text-center pb-4">
+                            <span class="text-2xl font-bold text-gray-800">Macsen Higgins</span>
+                        </td>
+                        <td class="text-center pb-4">
+                            <span class="text-2xl font-bold text-gray-800">Jacob Southern</span>
+                        </td>
+                    </tr>
 
+                    <!-- Row 2: Photos -->
+                    <tr>
+                        <td class="text-center pb-2">
+                            <img src="assets/images/sp_macsen.png" alt="Macsen Higgins" 
+                                class="inline-block w-[150px] rounded-lg shadow-sm border border-gray-200 object-cover">
+                        </td>
+                        <td class="text-center pb-2">
+                            <img src="assets/images/sp_jacob.png" alt="Jacob Southern" 
+                                class="inline-block w-[150px] rounded-lg shadow-sm border border-gray-200 object-cover">
+                        </td>
+                    </tr>
 
-        
-</script>
+                    <!-- Row 3: Roles -->
+                    <tr>
+                        <td class="text-center italic text-sm text-gray-500">
+                            Lead Developer
+                        </td>
+                        <td class="text-center italic text-sm text-gray-500">
+                            Lead Documentarian
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
 
+        </main>
 
+            <hr class="border-gray-200 mb-8">
 
+            <!-- Connect Header -->
+            <div class="max-w-2xl mx-auto mb-4">
+                <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <span class="bg-blue-600 w-2 h-6 rounded-full"></span>
+                    Connect With Us!
+                </h3>
+            </div>
+
+            <!-- Partner Contact & Resources Table -->
+            <div class="max-w-2xl mx-auto mb-8 overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+                <table class="w-full text-left border-collapse bg-white">
+                    <thead class="bg-gray-100 text-gray-700 uppercase text-xs font-bold tracking-wider">
+                        <tr>
+                            <th class="px-6 py-4 border-b">Partner Name</th>
+                            <th class="px-6 py-4 border-b">Professional Link</th>
+                            <th class="px-6 py-4 border-b">Resume</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-600 divide-y divide-gray-100">
+                        <!-- Macsen's Row -->
+                        <tr class="hover:bg-blue-50/50 transition-colors">
+                            <td class="px-6 py-4 font-semibold text-gray-800">Macsen Higgins</td>
+                            <td class="px-6 py-4">
+                                <a href="https://www.linkedin.com/in/macsenhiggins" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                                    LinkedIn 
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                </a>
+                            </td>
+                            <td class="px-6 py-4">
+                                <a href="assets/macsen_resume.pdf" target="_blank" class="inline-flex items-center px-3 py-1 bg-gray-800 text-white text-xs rounded hover:bg-gray-700 transition-colors">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                        <!-- Jacob's Row -->
+                        <tr class="hover:bg-blue-50/50 transition-colors">
+                            <td class="px-6 py-4 font-semibold text-gray-800">Jacob Southern</td>
+                            <td class="px-6 py-4">
+                                <a href="https://www.linkedin.com/in/YOUR-PROFILE" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                                    LinkedIn
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                </a>
+                            </td>
+                            <td class="px-6 py-4">
+                                <a href="assets/jacob_resume.pdf" target="_blank" class="inline-flex items-center px-3 py-1 bg-gray-800 text-white text-xs rounded hover:bg-gray-700 transition-colors">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-12 text-center text-gray-500 text-sm">
+            <p>Macsen Higgins & Jacob Southern, 2026</p>
+        </footer>
+    </div>
 </body>
 </html>
