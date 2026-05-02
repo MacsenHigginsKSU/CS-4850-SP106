@@ -12,7 +12,7 @@ Given a dataset from PJM Interconnection LLC documenting system-wide energy cons
 The finished website can be viewed under the Deployments tab.
 
 ## Project Organization
-
+```
 CS-4850-SP106/ 
 ├── .gitignore              | file in a Git repository that instructs Git which files to ignore 
 ├── README.md               | contains relevant background and instructions for the project 
@@ -46,3 +46,4 @@ CS-4850-SP106/
 ├── index.html              | html code for the landing page 
 ├── requirements.txt        | a file containing all dependencies needed to run the model code 
 └── user_datetime_predictions.csv   | file we import to the demo that contains predictive data
+```
